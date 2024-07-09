@@ -4,14 +4,16 @@ on:
   workflow_dispatch:
   push:
     branches:
-    - main
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
-    - uses: jakejarvis/s3-sync-action@master
+
+    - name: Sync S3 Bucket
+      uses: jakejarvis/s3-sync-action@master
       with:
         args: --acl private --follow-symlinks --delete
       env:
@@ -20,8 +22,8 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_REGION: 'us-east-1'
         SOURCE_DIR: 'website'
-
-        - name: Invalidate CloudFront Cache
+        
+    - name: Invalidate CloudFront Cache
       uses: aws-actions/aws-cloudfront-invalidate-cache@v1
       with:
         distribution-id: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
